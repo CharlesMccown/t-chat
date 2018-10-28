@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie-edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/index.css">
+
+    <title>TChat</title>
+</head>
+<body class="container-fluid form-inline">
+    <header class="header">
+        <h1>TChat</h1>
+        <input type="text" id="username" class="form-control" placeholder="Username"/>
+    </header>
+    <section>
+        <div class="panel panel-primary">
+            <div class="panel-heading">Messages</div>
+            <ul id="messages" class=""></ul>
+        </div>
+        <input type="text" id="create-message" class="form-control" placeholder="Enter Message"/>
+        <input type="button" class="btn btn-small btn-primary" id="send-message" value="Send"/>
+    </section>
+    <script type="text/javascript">
+    (function(){
+        const messageInput = document.querySelector("#create-message");
+        const usernameInput = document.querySelector("#username");
+        const messageSend = document.querySelector("#send-message");
+        const xHttp = new XMLHttpRequest();
+        const messages = [];
+
+        const sendMessage = () => {
+            const message = username.value != "" ?
+                `${username.value} says,  '${messageInput.value}'` :
+                messageInput.value;
+
+            xHttp.open('POST', 'messages', true);
+            xHttp.setRequestHeader("Content-Type", "application/json");
+            xHttp.send(`{
+                            "body": "${message}"
+                        }`);
+            messageInput.value = "";
+            messageInput.focus();
+        }
+
+        const messageKeyPress = (e) => {
+            if(e.keyCode == 13) {
+                sendMessage();
+            }
+        }
+
+        messageInput.addEventListener("keypress", messageKeyPress);
+        messageSend.addEventListener("click", sendMessage);
+
+        messageInput.focus();
+
+        if(!!window.EventSource) {
+            var evtSource = new EventSource('messages/events');
+            var eventList = document.querySelector('#messages');
+
+            evtSource.onmessage = function(e) {
+                var message = JSON.parse(e.data);
+                if(!messages.includes(message.id)) {
+                    messages.push(message.id);
+                    var newElem = document.createElement("li");
+                    newElem.textContent = message.body;
+                    eventList.appendChild(newElem);
+                }
+            }
+        } else {
+            console.error("The browser doesn't appear to support SSE. Please see https://caniuse.com/#search=EventSource for a list of supported browsers.");
+        }
+    })();
+    </script>
+</body>
+</html>

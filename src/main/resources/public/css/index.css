@@ -1,0 +1,19 @@
+header {
+    background-color: #337ab7;
+    color: white;
+    border-radius: 5px;
+    height: 100px;
+    margin: 15px 0px;
+    padding-bottom: 20px;
+}
+header h1 {
+    float: left;
+}
+header input {
+    float: right;
+    border-radius:5px;
+}
+ul#messages {
+    list-style: none;
+    padding: 5px;
+}
